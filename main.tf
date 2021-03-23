@@ -39,6 +39,16 @@ resource "aws_route_table" "prod-route-table" {
   }
 }
 //4. Create Subnet
+
+resource "aws_subnet" "prod-subnet" {
+  vpc_id     = aws_vpc.quantum2.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "prod-subnet"
+  }
+}
+
 //5. Associate Subnet with Route Table
 //6. Create Security group to allow ports 22, 80, 443
 //7. Create a network interface with an IP in the subnet
