@@ -12,7 +12,13 @@ resource "aws_vpc" "quantum2" {
 }
 
 //2. Create internet gateway
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.quantum2.id
 
+  tags = {
+    Name = "prod-gateway"
+  }
+}
 //3. Create custom Route Table
 //4. Create Subnet
 //5. Associate Subnet with Route Table
