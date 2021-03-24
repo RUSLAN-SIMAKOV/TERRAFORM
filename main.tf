@@ -43,6 +43,7 @@ resource "aws_route_table" "prod-route-table" {
 resource "aws_subnet" "prod-subnet" {
   vpc_id     = aws_vpc.quantum2.id
   cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-2a"
 
   tags = {
     Name = "prod-subnet"
@@ -109,7 +110,28 @@ resource "aws_eip" "one" {
   vpc                       = true
   network_interface         = aws_network_interface.web-server-nic.id
   associate_with_private_ip = "10.0.1.50"
-  depends_on = [aws_internet_gateway.gw.id]
+  depends_on = [aws_internet_gateway.gw]
 }
 
 //9. Create Ubuntu server and install/enable Apache2
+resource "aws_instance" "web-server-instance" {
+  ami = " ami-089c6f2e3866f0f14"
+  instance_type = "t2.micro"
+  availability_zone = "us-east-2a"
+  key_name = "quantum.pem"
+
+  network_interface {
+    device_index = 0
+    network_interface_id = aws_network_interface.web-server-nic.id
+  }
+
+  user_data = <<-EOF
+                 sudo apt update -y
+                 sudo apt install apache2 -y
+                 sudo systemctl start apache2
+                 sudo bash -c 'echo web server > /var/www/html/index.html'
+                 EOF
+  tags = {
+    Name = "web-server"
+  }
+}
